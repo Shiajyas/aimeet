@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { FaGoogle,FaGithub} from "react-icons/fa"
 import{
   Form,
   FormControl,
@@ -37,8 +38,7 @@ const formSchema = z.object({
 
 
 export const SignUpView = () => {
-
-    const router = useRouter()
+    const router = useRouter();
     const [error,setError] = useState<string|null>(null)
     const [pending,setPending] = useState<boolean>(false)
 
@@ -52,18 +52,16 @@ export const SignUpView = () => {
         },
     })
 
-    const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const onSocial = (provider: "google" | "github") => {
        setError(null)
        setPending(true)
-         authClient.signUp.email({
-            name: data.name,
-            email: data.email,
-            password: data.password,
+         authClient.signIn.social({
+           provider: provider,
+           callbackURL: "/"
          },
         {
             onSuccess: () => {
                 setPending(false)
-                router.push("/")
             },
             onError: (e) => {
                setPending(false)
@@ -74,6 +72,29 @@ export const SignUpView = () => {
       
     }
     
+        const onSubmit = (data: z.infer<typeof formSchema>) => {
+       setError(null)
+       setPending(true)
+         authClient.signUp.email({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            callbackURL: "/"
+         },
+        {
+            onSuccess: () => {
+                setPending(false)
+                router.push("/")
+                
+            },
+            onError: (e) => {
+               setPending(false)
+                setError(e.error.message)
+            }
+        }
+        )
+      
+    }
     return (
         <div className="flex flex-col gap-6">
        <Card className="overflow-hidden p-0">
@@ -87,7 +108,7 @@ export const SignUpView = () => {
                     <div className="flex flex-col items-center text-center">
                         <h1 className="text-2xl font-semibold">
                           Let&apos; get started
-                        </h1>
+                        </h1> 
                         <p className="text-muted-foreground text-balance">
                           Create your account
                         </p>
@@ -189,18 +210,20 @@ export const SignUpView = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <Button type="button"
+                           onClick={() => onSocial("google")}
                            variant="outline"
-                           className="w-full"
+                           className="w-full hover:bg-purple-200"
                            >
-                            Google
+                            <FaGoogle className="mr-2 h-4 w-4" />
                           </Button>
-                          <Button 
-                          type="button" 
-                          variant="outline"
-                          className="w-full"
-                          >
-                            Github
-                          </Button>
+                         <Button 
+                        type="button" 
+                        onClick={() => onSocial("github")}
+                        variant="outline"
+                        className="w-full hover:bg-purple-200"
+                        >
+                        <FaGithub className="mr-2 h-4 w-4" />
+                        </Button>
                         
                         </div>
                           <div className="text-center text-sm">
